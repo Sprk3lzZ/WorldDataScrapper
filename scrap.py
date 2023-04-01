@@ -1,8 +1,10 @@
+import os
+import json
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
 
+
+BASE_URL = "https://www.worldometers.info"
 
 def get_flags(url):
     """This function get the countries flags from a website
@@ -14,17 +16,12 @@ def get_flags(url):
         List: The list with all flags url
     """
     response = requests.get(url)
-    flags = []
 
-    if response.ok:
-        soup = BeautifulSoup(response.text, 'lxml')
-        tds = soup.findAll('div', class_="col-md-4")
-
-        for td in tds:
-            if (td.find('a') != None):
-                flags.append('https://www.worldometers.info' +
-                             str(td.find('a')['href']))
-        return flags
+    if not response.ok:
+        return []
+    soup = BeautifulSoup(response.text, 'lxml')
+    tds = soup.findAll('div', class_="col-md-4")
+    return [BASE_URL + str(td.find('a')['href']) for td in tds if td.find('a')]
 
 
 def get_countries_infos(url):
