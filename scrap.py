@@ -21,7 +21,8 @@ def get_flags(url):
         return []
     soup = BeautifulSoup(response.text, 'lxml')
     tds = soup.findAll('div', class_="col-md-4")
-    return [BASE_URL + str(td.find('a')['href']) for td in tds if td.find('a')]
+    return [{"name": td.find('div').find('div').text, "flag": BASE_URL + str(td.find('a')['href'])}
+            for td in tds if td.find('a')]
 
 
 def get_countries_infos(url):
@@ -43,16 +44,13 @@ def get_countries_infos(url):
     get_children = lambda children: (children[1].text, children[2].text, children[3].text, ) if len(children) >= 4 else ()
     return [get_children(parents[i].findAll('td')) for i in range(1, 196)]
 
-def download_flags(flags, countries, folder):
+def download_flags(flags, folder):
     """This function dowload all flags images into a folder.
 
     Args:
         flags (List): The list with all flags url
-        countries (List of Tuples): The list with all countries/population tuples 
         folder (String): The folder within the images will be downloaded
     """
-    countries = sorted(countries)
-
     if not os.path.isdir(folder):
         try:
             os.mkdir(folder)
@@ -60,10 +58,10 @@ def download_flags(flags, countries, folder):
             print("Unable to create the save folder, aborted")
             return
     for i in range(len(flags)):
-        country = countries[i][0].replace(" ", "_")
-        r = requests.get(flags[i], allow_redirects=True)
+        country = flags[i]["name"].replace(" ", "_").lower()
+        r = requests.get(flags[i]["flag"], allow_redirects=True)
         try:
-            s = open(os.path.join(folder, country.lower() + '.png'), 'wb+')
+            s = open(os.path.join(folder, country + '.png'), 'wb+')
         except OSError:
             print("Unable to save content, ignored")
         else:
@@ -90,18 +88,17 @@ def test():
     flags = get_flags("{}/geography/flags-of-the-world/".format(BASE_URL))
     countries = get_countries_infos("{}/geography/countries-of-the-world/".format(BASE_URL))
     assert len(flags) == len(countries), "There is not the same amount of flags than countries."
-    countries = sorted(countries)
     data = {'nb_countries': len(countries), "countries": []}
 
     for i in range(data["nb_countries"]):
         data["countries"].append({
-            "name": countries[i][0],
+            "name": flags[i]["name"],
             "region": countries[i][2],
             "population": countries[i][1],
-            "flag": flags[i]
+            "flag": flags[i]["flag"]
         })
+    download_flags(flags, 'data_images')
     create_json(data, 'countries.json')
-    download_flags(flags, countries, 'data_images')
 
 if __name__ == "__main__":
     test()
