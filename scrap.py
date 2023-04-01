@@ -77,10 +77,13 @@ def create_json(data, fileName):
         data (List of Dict): The list with all dicts data
         fileName (String): The name of the json file
     """
-    jsonString = json.dumps(data, indent=4)
-    jsonFile = open(fileName, 'w')
-    jsonFile.write(jsonString)
-    jsonFile.close()
+    try:
+        jsonFile = open(fileName, 'w+')
+        json.dump(data, jsonFile, indent=4)
+    except OSError:
+        print("Unable to save data, ignored")
+    else:
+        jsonFile.close()
 
 
 flags = get_flags(
