@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.worldometers.info"
 
+
 def get_flags(url):
     """This function get the countries flags from a website
 
@@ -41,8 +42,10 @@ def get_countries_infos(url):
     soup = BeautifulSoup(response.text, 'lxml')
     tds = soup.findAll('div', class_="table-responsive")
     parents = tds[0].find('table').findAll('tr')
-    get_children = lambda children: (children[1].text, children[2].text, children[3].text, ) if len(children) >= 4 else ()
+    def get_children(children): return (
+        children[1].text, children[2].text, children[3].text, ) if len(children) >= 4 else ()
     return [get_children(parents[i].findAll('td')) for i in range(1, 196)]
+
 
 def download_flags(flags, folder):
     """This function dowload all flags images into a folder.
@@ -68,6 +71,7 @@ def download_flags(flags, folder):
             s.write(r.content)
             s.close()
 
+
 def create_json(data, fileName):
     """This function create a json file with data list
 
@@ -86,8 +90,10 @@ def create_json(data, fileName):
 
 def test():
     flags = get_flags("{}/geography/flags-of-the-world/".format(BASE_URL))
-    countries = get_countries_infos("{}/geography/countries-of-the-world/".format(BASE_URL))
-    assert len(flags) == len(countries), "There is not the same amount of flags than countries."
+    countries = get_countries_infos(
+        "{}/geography/countries-of-the-world/".format(BASE_URL))
+    assert len(flags) == len(
+        countries), "There is not the same amount of flags than countries."
     data = {'nb_countries': len(countries), "countries": []}
 
     for i in range(data["nb_countries"]):
@@ -97,8 +103,9 @@ def test():
             "population": countries[i][1],
             "flag": flags[i]["flag"]
         })
-    download_flags(flags, 'data_images')
     create_json(data, 'countries.json')
+    download_flags(flags, 'data_images')
+
 
 if __name__ == "__main__":
     test()
