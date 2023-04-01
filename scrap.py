@@ -35,14 +35,14 @@ def get_countries_infos(url):
     """
     response = requests.get(url)
 
-    if response.ok:
-        soup = BeautifulSoup(response.text, 'lxml')
-        tds = soup.findAll('div', class_="table-responsive")
-        countries = []
-
-        for i in range(1, 196):
-            parent = tds[0].find('table').findAll('tr')[i].findAll('td')
-            countries.append((parent[1].text, parent[2].text, parent[3].text, ))
+    if not response.ok:
+        return []
+    soup = BeautifulSoup(response.text, 'lxml')
+    tds = soup.findAll('div', class_="table-responsive")
+    countries = []
+    for i in range(1, 196):
+        parent = tds[0].find('table').findAll('tr')[i].findAll('td')
+        countries.append((parent[1].text, parent[2].text, parent[3].text, ))
     return countries
 
 
