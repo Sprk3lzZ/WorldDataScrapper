@@ -86,18 +86,22 @@ def create_json(data, fileName):
         jsonFile.close()
 
 
-flags = get_flags(
-    'https://www.worldometers.info/geography/flags-of-the-world/')
-countries = get_countries_infos(
-    'https://www.worldometers.info/geography/countries-of-the-world/')
-countries = sorted(countries)
+def test():
+    flags = get_flags("{}/geography/flags-of-the-world/".format(BASE_URL))
+    countries = get_countries_infos("{}/geography/countries-of-the-world/".format(BASE_URL))
+    assert len(flags) == len(countries), "There is not the same amount of flags than countries."
+    countries = sorted(countries)
+    data = {'nb_countries': len(countries), "countries": []}
 
-data = [{'nb_countries': len(countries)}]
+    for i in range(data["nb_countries"]):
+        data["countries"].append({
+            "name": countries[i][0],
+            "region": countries[i][2],
+            "population": countries[i][1],
+            "flag": flags[i]
+        })
+    create_json(data, 'countries.json')
+    download_flags(flags, countries, 'data_images')
 
-for i in range(len(flags)):
-    data.append(
-        {'country': countries[i][0], 'region': countries[i][2], 'population': countries[i][1], 'flag': flags[i]})
-
-
-create_json(data, 'countries.json')
-download_flags(flags, countries, 'data_images')
+if __name__ == "__main__":
+    test()
