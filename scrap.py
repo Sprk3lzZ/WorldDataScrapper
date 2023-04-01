@@ -53,13 +53,22 @@ def download_flags(flags, countries, folder):
     """
     countries = sorted(countries)
 
-    if (not os.path.isdir(folder)):
-        os.mkdir(folder)
+    if not os.path.isdir(folder):
+        try:
+            os.mkdir(folder)
+        except:
+            print("Unable to create the save folder, aborted")
+            return
     for i in range(len(flags)):
         country = countries[i][0].replace(" ", "_")
         r = requests.get(flags[i], allow_redirects=True)
-        open(folder + '/' + country.lower() + '.png', 'wb').write(r.content)
-
+        try:
+            s = open(os.path.join(folder, country.lower() + '.png'), 'wb+')
+        except OSError:
+            print("Unable to save content, ignored")
+        else:
+            s.write(r.content)
+            s.close()
 
 def create_json(data, fileName):
     """This function create a json file with data list
