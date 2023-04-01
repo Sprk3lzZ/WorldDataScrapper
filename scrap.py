@@ -39,12 +39,9 @@ def get_countries_infos(url):
         return []
     soup = BeautifulSoup(response.text, 'lxml')
     tds = soup.findAll('div', class_="table-responsive")
-    countries = []
-    for i in range(1, 196):
-        parent = tds[0].find('table').findAll('tr')[i].findAll('td')
-        countries.append((parent[1].text, parent[2].text, parent[3].text, ))
-    return countries
-
+    parents = tds[0].find('table').findAll('tr')
+    get_children = lambda children: (children[1].text, children[2].text, children[3].text, ) if len(children) >= 4 else ()
+    return [get_children(parents[i].findAll('td')) for i in range(1, 196)]
 
 def download_flags(flags, countries, folder):
     """This function dowload all flags images into a folder.
