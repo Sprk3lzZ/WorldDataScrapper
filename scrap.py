@@ -41,8 +41,8 @@ def get_countries_infos(url):
         countries = []
 
         for i in range(1, 196):
-            countries.append([tds[0].find('table').findAll('tr')[i].findAll(
-                'td')[1].text, tds[0].find('table').findAll('tr')[i].findAll('td')[2].text, tds[0].find('table').findAll('tr')[i].findAll('td')[3].text])
+            parent = tds[0].find('table').findAll('tr')[i].findAll('td')
+            countries.append([parent[1].text, parent[2].text, parent[3].text])
     return countries
 
 
