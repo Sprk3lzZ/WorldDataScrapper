@@ -27,14 +27,14 @@ def get_flags(url):
         return flags
 
 
-def get_countries_and_population(url):
+def get_countries_infos(url):
     """This function get the countries name and population from a website.
 
     Args:
         url (String): The url of the targeted website
 
     Returns:
-        List of Tuples: The list with all countries/population tuples
+        List of Tuples: The list with all countries/population/region tuples
     """
     response = requests.get(url)
 
@@ -44,8 +44,8 @@ def get_countries_and_population(url):
         countries = []
 
         for i in range(1, 196):
-            countries.append((tds[0].find('table').findAll('tr')[i].findAll(
-                'td')[1].text, tds[0].find('table').findAll('tr')[i].findAll('td')[2].text))
+            countries.append([tds[0].find('table').findAll('tr')[i].findAll(
+                'td')[1].text, tds[0].find('table').findAll('tr')[i].findAll('td')[2].text, tds[0].find('table').findAll('tr')[i].findAll('td')[3].text])
     return countries
 
 
@@ -82,7 +82,7 @@ def create_json(data, fileName):
 
 flags = get_flags(
     'https://www.worldometers.info/geography/flags-of-the-world/')
-countries = get_countries_and_population(
+countries = get_countries_infos(
     'https://www.worldometers.info/geography/countries-of-the-world/')
 countries = sorted(countries)
 
@@ -90,7 +90,7 @@ data = [{'nb_countries': len(countries)}]
 
 for i in range(len(flags)):
     data.append(
-        {'country': countries[i][0], 'population': countries[i][1], 'flag': flags[i]})
+        {'country': countries[i][0], 'region': countries[i][2], 'population': countries[i][1], 'flag': flags[i]})
 
 
 create_json(data, 'countries.json')
