@@ -42,7 +42,7 @@ def get_countries_infos(url):
 
         for i in range(1, 196):
             parent = tds[0].find('table').findAll('tr')[i].findAll('td')
-            countries.append([parent[1].text, parent[2].text, parent[3].text])
+            countries.append((parent[1].text, parent[2].text, parent[3].text, ))
     return countries
 
 
